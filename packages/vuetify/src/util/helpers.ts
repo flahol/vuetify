@@ -413,17 +413,20 @@ export function sortItems (
   })
 }
 
+export type filterFn = (value: any, search: string, item: any) => boolean
+
+export function defaultFilter (value: any, search: string) {
+  return value != null &&
+    typeof value !== 'boolean' &&
+    value.toString().toLowerCase().indexOf(search) !== -1
+}
+
 export function searchItems (items: any[], search: string) {
   if (!search) return items
   search = search.toString().toLowerCase()
   if (search.trim() === '') return items
 
-  return items.filter(i => Object.keys(i).some(j => {
-    const val = i[j]
-    return val != null &&
-      typeof val !== 'boolean' &&
-      val.toString().toLowerCase().indexOf(search) !== -1
-  }))
+  return items.filter(item => Object.keys(item).some(key => defaultFilter(getObjectValueByPath(item, key), search)))
 }
 
 export function getTextAlignment (align: string | undefined, rtl: boolean): string {
